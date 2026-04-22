@@ -3,11 +3,41 @@
 <head>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; overflow: hidden; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
         iframe { width: 100%; height: 100%; border: none; display: block; }
+        #loader { position: fixed; inset: 0; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; transition: opacity 0.4s; }
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        .spinner { width: 48px; height: 48px; border: 5px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loader p { color: #aaa; font-family: Arial, sans-serif; font-size: 14px; }
     </style>
 </head>
 <body>
-    <iframe src="https://ext.minijuegosgratis.com/trees-hate-you/index.html?mp_assets=https%3A%2F%2Fs2.minijuegosgratis.com%2F&mp_embed=0&mp_game_id=256932&mp_game_uid=trees-hate-you&mp_game_url=https%3A%2F%2Fwww.miniplay.com%2Fgame%2Ftrees-hate-you&mp_int=1&mp_locale=en_US&mp_player_type=IFRAME&mp_site_https_url=https%3A%2F%2Fwww.miniplay.com%2F&mp_site_name=miniplay.com&mp_site_url=https%3A%2F%2Fwww.miniplay.com%2F&mp_timezone=Asia%2FSingapore&mp_view_type=" allowfullscreen></iframe>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p>Loading game...</p>
+    </div>
+    <iframe id="gameFrame" allowfullscreen allow="autoplay; fullscreen; gamepad"></iframe>
+    <script src="/uv/uv.bundle.js"></script>
+    <script src="/uv/uv.config.js"></script>
+    <script>
+        const GAME_URL = "https://ext.minijuegosgratis.com/trees-hate-you/index.html?mp_assets=https%3A%2F%2Fs2.minijuegosgratis.com%2F&mp_embed=0&mp_game_id=256932&mp_game_uid=trees-hate-you&mp_game_url=https%3A%2F%2Fwww.miniplay.com%2Fgame%2Ftrees-hate-you&mp_int=1&mp_locale=en_US&mp_player_type=IFRAME&mp_site_https_url=https%3A%2F%2Fwww.miniplay.com%2F&mp_site_name=miniplay.com&mp_site_url=https%3A%2F%2Fwww.miniplay.com%2F&mp_timezone=Asia%2FSingapore&mp_view_type=";
+        const frame = document.getElementById('gameFrame');
+        const loader = document.getElementById('loader');
+
+        navigator.serviceWorker.register("/uv/uv.sw.js", { scope: "/uv/service/" })
+        .then(() => {
+            frame.src = __uv$config.prefix + __uv$config.encodeUrl(GAME_URL);
+        }).catch(() => {
+            frame.src = GAME_URL;
+        });
+
+        frame.addEventListener('load', () => {
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                setTimeout(() => loader.style.display = 'none', 400);
+            }, 500);
+        });
+    </script>
 </body>
 </html>
