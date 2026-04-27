@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Math Activity</title>
+    <title>Math Activity - Dino Run</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
         #container { width: 100vw; height: 100vh; }
@@ -19,10 +19,8 @@
             const player = ruffle.createPlayer();
             document.getElementById("container").appendChild(player);
             
-            // We use the FULL link to your GitHub file to make sure it never fails
-            const gameUrl = "https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dino-run.swf";
-            
-            player.load(gameUrl);
+            // On Vercel, just using the filename is the safest way
+            player.load("dino-run.swf"); 
             
             player.style.width = "100%";
             player.style.height = "100%";
