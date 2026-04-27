@@ -9,7 +9,9 @@
 </head>
 <body>
     <div id="container"></div>
+
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    
     <script>
         window.RufflePlayer = window.RufflePlayer || {};
         window.addEventListener("load", (event) => {
@@ -17,8 +19,10 @@
             const player = ruffle.createPlayer();
             document.getElementById("container").appendChild(player);
             
-            // This tells Ruffle to look in YOUR GitHub folder, not a random link
-            player.load("dino-run.swf"); 
+            // We use the FULL link to your GitHub file to make sure it never fails
+            const gameUrl = "https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dino-run.swf";
+            
+            player.load(gameUrl);
             
             player.style.width = "100%";
             player.style.height = "100%";
