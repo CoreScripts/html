@@ -17,19 +17,22 @@
         <div class="spinner"></div>
         <p>Loading game...</p>
     </div>
-    <ruffle-player id="game" src="https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf"></ruffle-player>
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <script>
+        window.RufflePlayer = window.RufflePlayer || {};
+        window.RufflePlayer.config = {
+            autoplay: "on",
+            unmuteOverlay: "hidden",
+        };
+    </script>
+    <ruffle-player id="game" src="https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf"></ruffle-player>
+    <script>
         const loader = document.getElementById('loader');
-        const game = document.getElementById('game');
-        game.addEventListener('loadeddata', () => {
-            loader.classList.add('hidden');
-            setTimeout(() => loader.style.display = 'none', 400);
-        });
+        // just hide loader after 5 seconds as fallback
         setTimeout(() => {
             loader.classList.add('hidden');
             setTimeout(() => loader.style.display = 'none', 400);
-        }, 4000);
+        }, 5000);
     </script>
 </body>
 </html>
