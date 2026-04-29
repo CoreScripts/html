@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Dino Run Planet D</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* This centers the game perfectly in the browser window */
+        html, body { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background: #000; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        /* Dino Run is best viewed at this aspect ratio */
+        #game-container { 
+            width: 100%; 
+            height: 100%; 
+            max-width: 800px; 
+            max-height: 450px; 
+        }
+        ruffle-player {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container"></div>
+
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <script>
+        window.RufflePlayer = window.RufflePlayer || {};
+        window.addEventListener("DOMContentLoaded", () => {
+            const ruffle = window.RufflePlayer.newest();
+            const player = ruffle.createPlayer();
+            document.getElementById("game-container").appendChild(player);
+
+            player.config = {
+                "quality": "low",
+                "letterbox": "on",
+                "scale": "showAll",
+                "forceScale": true,
+                "allowScriptAccess": "always",
+                "base": "https://www.pixeljam.com/dinorun/",
+                "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
+            };
+
+            // Using the version tag one last time to ensure you don't see the old 'Oops' screen
+            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=2");
+        });
+    </script>
+</body>
+</html>
