@@ -2,9 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Dino Run: Enter Planet D</title>
     <style>
-        /* Prevents scrolling and zooming */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; touch-action: none; }
         
         html, body { 
@@ -13,54 +11,67 @@
             display: flex; flex-direction: column; 
             overflow: hidden; 
         }
-        
-        /* Game fills the top space */
-        #ruffle-container {
-            flex-grow: 1; 
+
+        /* Adds the vertical margins you requested around the player */
+        #game-area {
+            flex: 1;
             width: 100%;
-            background: #000;
-        }
-
-        /* Controls Area - Using Space-Between to split sides */
-        #mobile-ui {
-            width: 100%;
-            display: flex;
-            justify-content: space-between; /* This pushes groups to the left and right */
-            align-items: center;
-            padding: 20px 40px;
-            background: #111;
-            border-top: 1px solid #333;
-            height: 140px; /* Comfortable height for thumbs */
-        }
-
-        .btn-group { display: flex; gap: 20px; }
-
-        .ctrl-btn {
-            width: 85px;
-            height: 85px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            color: white;
+            padding: 20px 0; /* Top and bottom margin for the player */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 36px;
-            font-family: sans-serif;
-            transition: transform 0.05s, background 0.05s;
         }
 
-        /* Active visual feedback for multi-touch */
+        #ruffle-container {
+            width: 95%; /* Leaves a small side margin */
+            height: 100%;
+            position: relative;
+        }
+
+        ruffle-player {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Controls Area - Centered at the bottom */
+        #mobile-ui {
+            width: 100%;
+            height: 140px;
+            display: flex;
+            justify-content: center; /* Puts keypads in the middle */
+            align-items: center;
+            gap: 40px; /* Space between the left and right sets of buttons */
+            padding-bottom: 20px;
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        .ctrl-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-family: sans-serif;
+            transition: background 0.1s;
+        }
+
         .ctrl-btn.active { 
-            background: rgba(255, 255, 255, 0.4); 
-            transform: scale(0.9); 
-            border-color: #fff;
+            background: rgba(255, 255, 255, 0.5); 
+            transform: scale(0.95); 
         }
     </style>
 </head>
 <body>
 
-    <div id="ruffle-container"></div>
+    <div id="game-area">
+        <div id="ruffle-container"></div>
+    </div>
     
     <div id="mobile-ui">
         <div class="btn-group">
@@ -77,11 +88,9 @@
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <script>
         window.RufflePlayer = window.RufflePlayer || {};
-        let player;
-
         window.addEventListener("DOMContentLoaded", () => {
             const ruffle = window.RufflePlayer.newest();
-            player = ruffle.createPlayer();
+            const player = ruffle.createPlayer();
             document.getElementById("ruffle-container").appendChild(player);
 
             player.config = {
@@ -89,13 +98,11 @@
                 "letterbox": "on",
                 "scale": "showAll",
                 "forceScale": true,
-                "allowScriptAccess": "always",
                 "base": "https://www.pixeljam.com/dinorun/",
                 "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
             };
 
-            // Using v=2 to skip the CDN cache
-            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=2");
+            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=3");
 
             const keyMap = {
                 "btn-a": { key: "a", code: "KeyA", keyCode: 65 },
@@ -104,37 +111,20 @@
                 "btn-s": { key: "s", code: "KeyS", keyCode: 83 }
             };
 
-            function triggerKey(btn, data, type) {
-                const event = new KeyboardEvent(type, {
-                    key: data.key, code: data.code, keyCode: data.keyCode,
-                    which: data.keyCode, bubbles: true, cancelable: true
-                });
-                player.dispatchEvent(event);
-
-                if (type === "keydown") {
-                    btn.classList.add("active");
-                } else {
-                    btn.classList.remove("active");
-                }
+            function trigger(btn, data, type) {
+                player.dispatchEvent(new KeyboardEvent(type, {
+                    key: data.key, code: data.code, keyCode: data.keyCode, which: data.keyCode, bubbles: true
+                }));
+                btn.classList[type === "keydown" ? "add" : "remove"]("active");
             }
 
             Object.keys(keyMap).forEach(id => {
                 const btn = document.getElementById(id);
                 const data = keyMap[id];
-
-                btn.addEventListener("touchstart", (e) => { 
-                    e.preventDefault(); 
-                    triggerKey(btn, data, "keydown"); 
-                });
-                btn.addEventListener("touchend", (e) => { 
-                    e.preventDefault(); 
-                    triggerKey(btn, data, "keyup"); 
-                });
-
-                // Support for Desktop testing
-                btn.addEventListener("mousedown", () => triggerKey(btn, data, "keydown"));
-                btn.addEventListener("mouseup", () => triggerKey(btn, data, "keyup"));
-                btn.addEventListener("mouseleave", () => btn.classList.remove("active"));
+                btn.addEventListener("touchstart", (e) => { e.preventDefault(); trigger(btn, data, "keydown"); });
+                btn.addEventListener("touchend", (e) => { e.preventDefault(); trigger(btn, data, "keyup"); });
+                btn.addEventListener("mousedown", () => trigger(btn, data, "keydown"));
+                btn.addEventListener("mouseup", () => trigger(btn, data, "keyup"));
             });
         });
     </script>
