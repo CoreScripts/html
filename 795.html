@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <style>
-        /* Removes all margins and scrollbars */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html, body { 
@@ -13,13 +12,11 @@
             overflow: hidden; 
         }
 
-        /* Forces the container to fill the entire viewport */
         #ruffle-container {
             width: 100vw;
             height: 100vh;
         }
 
-        /* Forces the player element to match the container */
         ruffle-player {
             width: 100% !important;
             height: 100% !important;
@@ -40,15 +37,14 @@
 
             player.config = {
                 "quality": "high",
-                "letterbox": "on",     /* Keeps aspect ratio correct with black bars */
-                "scale": "showAll",    /* Ensures no part of the game is cut off */
+                "letterbox": "on",
+                "scale": "showAll",
                 "forceScale": true,
                 "allowScriptAccess": "always",
                 "base": "https://www.pixeljam.com/dinorun/",
                 "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
             };
 
-            // Using v=4 to bypass any existing cache
             player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=4");
         });
     </script>
