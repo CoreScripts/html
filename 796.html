@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+        #ruffle-container { width: 100vw; height: 100vh; }
+        ruffle-player { width: 100% !important; height: 100% !important; }
+    </style>
+</head>
+<body>
+    <div id="ruffle-container"></div>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <script>
+        window.RufflePlayer = window.RufflePlayer || {};
+        window.addEventListener("DOMContentLoaded", () => {
+            const ruffle = window.RufflePlayer.newest();
+            const player = ruffle.createPlayer();
+            document.getElementById("ruffle-container").appendChild(player);
+            player.config = {
+                "quality": "high",
+                "letterbox": "on",
+                "scale": "showAll",
+                "forceScale": true,
+                "allowScriptAccess": "always",
+                "base": "https://www.pixeljam.com/dinorun/",
+                "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
+            };
+            // Replace 'dinorun_dx.swf' with the actual filename in your repository
+            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun_dx.swf");
+        });
+    </script>
+</body>
+</html>
