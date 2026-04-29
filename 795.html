@@ -4,76 +4,73 @@
     <meta charset="utf-8">
     <title>Dino Run: Enter Planet D</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; }
+        /* Prevents scrolling and zooming */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; touch-action: none; }
+        
         html, body { 
-            width: 100%; height: 100%; overflow: hidden; 
-            background: #000; display: flex; justify-content: center; align-items: center; 
+            width: 100%; height: 100%; 
+            background: #000; 
+            display: flex; flex-direction: column; 
+            overflow: hidden; 
         }
         
-        #game-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            max-width: 800px;
-            max-height: 450px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+        /* Game fills the top space */
         #ruffle-container {
+            flex-grow: 1; 
             width: 100%;
-            height: 100%;
-            z-index: 1;
+            background: #000;
         }
 
+        /* Controls Area - Using Space-Between to split sides */
         #mobile-ui {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
             width: 100%;
             display: flex;
-            justify-content: space-between;
-            padding: 0 30px;
-            z-index: 999;
-            pointer-events: none; 
+            justify-content: space-between; /* This pushes groups to the left and right */
+            align-items: center;
+            padding: 20px 40px;
+            background: #111;
+            border-top: 1px solid #333;
+            height: 140px; /* Comfortable height for thumbs */
         }
 
-        .btn-group { display: flex; gap: 15px; pointer-events: auto; }
+        .btn-group { display: flex; gap: 20px; }
 
         .ctrl-btn {
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.3);
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            border-radius: 15px;
+            width: 85px;
+            height: 85px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
             color: white;
-            font-weight: bold;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 32px; /* Increased for arrows */
+            font-size: 36px;
             font-family: sans-serif;
-            touch-action: none;
+            transition: transform 0.05s, background 0.05s;
         }
 
-        .ctrl-btn:active { background: rgba(255, 255, 255, 0.6); transform: scale(0.9); }
+        /* Active visual feedback for multi-touch */
+        .ctrl-btn.active { 
+            background: rgba(255, 255, 255, 0.4); 
+            transform: scale(0.9); 
+            border-color: #fff;
+        }
     </style>
 </head>
 <body>
 
-    <div id="game-wrapper">
-        <div id="ruffle-container"></div>
-        
-        <div id="mobile-ui">
-            <div class="btn-group">
-                <div class="ctrl-btn" id="btn-a">←</div>
-                <div class="ctrl-btn" id="btn-d">→</div>
-            </div>
-            <div class="btn-group">
-                <div class="ctrl-btn" id="btn-s">↓</div>
-                <div class="ctrl-btn" id="btn-w">↑</div>
-            </div>
+    <div id="ruffle-container"></div>
+    
+    <div id="mobile-ui">
+        <div class="btn-group">
+            <div class="ctrl-btn" id="btn-a">←</div>
+            <div class="ctrl-btn" id="btn-d">→</div>
+        </div>
+
+        <div class="btn-group">
+            <div class="ctrl-btn" id="btn-s">↓</div>
+            <div class="ctrl-btn" id="btn-w">↑</div>
         </div>
     </div>
 
@@ -88,14 +85,16 @@
             document.getElementById("ruffle-container").appendChild(player);
 
             player.config = {
-                "quality": "low",
+                "quality": "high",
                 "letterbox": "on",
+                "scale": "showAll",
+                "forceScale": true,
                 "allowScriptAccess": "always",
                 "base": "https://www.pixeljam.com/dinorun/",
                 "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
             };
 
-            // Using v=2 to keep using your working version
+            // Using v=2 to skip the CDN cache
             player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=2");
 
             const keyMap = {
@@ -105,26 +104,37 @@
                 "btn-s": { key: "s", code: "KeyS", keyCode: 83 }
             };
 
-            function triggerKey(data, type) {
+            function triggerKey(btn, data, type) {
                 const event = new KeyboardEvent(type, {
-                    key: data.key,
-                    code: data.code,
-                    keyCode: data.keyCode,
-                    which: data.keyCode,
-                    bubbles: true,
-                    cancelable: true
+                    key: data.key, code: data.code, keyCode: data.keyCode,
+                    which: data.keyCode, bubbles: true, cancelable: true
                 });
                 player.dispatchEvent(event);
+
+                if (type === "keydown") {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
             }
 
             Object.keys(keyMap).forEach(id => {
                 const btn = document.getElementById(id);
                 const data = keyMap[id];
 
-                btn.addEventListener("touchstart", (e) => { e.preventDefault(); triggerKey(data, "keydown"); });
-                btn.addEventListener("touchend", (e) => { e.preventDefault(); triggerKey(data, "keyup"); });
-                btn.addEventListener("mousedown", (e) => { triggerKey(data, "keydown"); });
-                btn.addEventListener("mouseup", (e) => { triggerKey(data, "keyup"); });
+                btn.addEventListener("touchstart", (e) => { 
+                    e.preventDefault(); 
+                    triggerKey(btn, data, "keydown"); 
+                });
+                btn.addEventListener("touchend", (e) => { 
+                    e.preventDefault(); 
+                    triggerKey(btn, data, "keyup"); 
+                });
+
+                // Support for Desktop testing
+                btn.addEventListener("mousedown", () => triggerKey(btn, data, "keydown"));
+                btn.addEventListener("mouseup", () => triggerKey(btn, data, "keyup"));
+                btn.addEventListener("mouseleave", () => btn.classList.remove("active"));
             });
         });
     </script>
