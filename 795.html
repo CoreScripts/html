@@ -3,87 +3,32 @@
 <head>
     <meta charset="utf-8">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; touch-action: none; }
+        /* Removes all margins and scrollbars */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         html, body { 
-            width: 100%; height: 100%; 
+            width: 100%; 
+            height: 100%; 
             background: #000; 
-            display: flex; flex-direction: column; 
             overflow: hidden; 
         }
 
-        /* Adds the vertical margins you requested around the player */
-        #game-area {
-            flex: 1;
-            width: 100%;
-            padding: 20px 0; /* Top and bottom margin for the player */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
+        /* Forces the container to fill the entire viewport */
         #ruffle-container {
-            width: 95%; /* Leaves a small side margin */
-            height: 100%;
-            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
 
+        /* Forces the player element to match the container */
         ruffle-player {
             width: 100% !important;
             height: 100% !important;
-        }
-
-        /* Controls Area - Centered at the bottom */
-        #mobile-ui {
-            width: 100%;
-            height: 140px;
-            display: flex;
-            justify-content: center; /* Puts keypads in the middle */
-            align-items: center;
-            gap: 40px; /* Space between the left and right sets of buttons */
-            padding-bottom: 20px;
-        }
-
-        .btn-group { display: flex; gap: 10px; }
-
-        .ctrl-btn {
-            width: 65px;
-            height: 65px;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 28px;
-            font-family: sans-serif;
-            transition: background 0.1s;
-        }
-
-        .ctrl-btn.active { 
-            background: rgba(255, 255, 255, 0.5); 
-            transform: scale(0.95); 
         }
     </style>
 </head>
 <body>
 
-    <div id="game-area">
-        <div id="ruffle-container"></div>
-    </div>
-    
-    <div id="mobile-ui">
-        <div class="btn-group">
-            <div class="ctrl-btn" id="btn-a">←</div>
-            <div class="ctrl-btn" id="btn-d">→</div>
-        </div>
-
-        <div class="btn-group">
-            <div class="ctrl-btn" id="btn-s">↓</div>
-            <div class="ctrl-btn" id="btn-w">↑</div>
-        </div>
-    </div>
+    <div id="ruffle-container"></div>
 
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <script>
@@ -95,37 +40,16 @@
 
             player.config = {
                 "quality": "high",
-                "letterbox": "on",
-                "scale": "showAll",
+                "letterbox": "on",     /* Keeps aspect ratio correct with black bars */
+                "scale": "showAll",    /* Ensures no part of the game is cut off */
                 "forceScale": true,
+                "allowScriptAccess": "always",
                 "base": "https://www.pixeljam.com/dinorun/",
                 "pageUrl": "https://www.pixeljam.com/dinorun/index2.html"
             };
 
-            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=3");
-
-            const keyMap = {
-                "btn-a": { key: "a", code: "KeyA", keyCode: 65 },
-                "btn-d": { key: "d", code: "KeyD", keyCode: 68 },
-                "btn-w": { key: "w", code: "KeyW", keyCode: 87 },
-                "btn-s": { key: "s", code: "KeyS", keyCode: 83 }
-            };
-
-            function trigger(btn, data, type) {
-                player.dispatchEvent(new KeyboardEvent(type, {
-                    key: data.key, code: data.code, keyCode: data.keyCode, which: data.keyCode, bubbles: true
-                }));
-                btn.classList[type === "keydown" ? "add" : "remove"]("active");
-            }
-
-            Object.keys(keyMap).forEach(id => {
-                const btn = document.getElementById(id);
-                const data = keyMap[id];
-                btn.addEventListener("touchstart", (e) => { e.preventDefault(); trigger(btn, data, "keydown"); });
-                btn.addEventListener("touchend", (e) => { e.preventDefault(); trigger(btn, data, "keyup"); });
-                btn.addEventListener("mousedown", () => trigger(btn, data, "keydown"));
-                btn.addEventListener("mouseup", () => trigger(btn, data, "keyup"));
-            });
+            // Using v=4 to bypass any existing cache
+            player.load("https://cdn.jsdelivr.net/gh/CoreScripts/html@main/dinorun.swf?v=4");
         });
     </script>
 </body>
